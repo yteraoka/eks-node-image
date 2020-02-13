@@ -1,0 +1,57 @@
+---
+# /etc/crontab で実行するため anacron での実行は除外
+- name: skip logrotate in anacron
+  lineinfile:
+    path: /etc/cron.daily/jobs.deny
+    line: logrotate
+    owner: root
+    group: root
+    mode: 0600
+    create: yes
+
+
+# たとえインストールされたとしても実行しない
+- name: disable updatedb cron job 
+  lineinfile:
+    path: /etc/cron.daily/jobs.deny
+    line: mlocate
+    owner: root
+    group: root
+    mode: 0600
+    create: yes
+
+
+# 5.1 Configure cron
+- name: Ensure permissions on /etc/cron files are configured
+  file:
+    state: directory
+    path: "{{ item }}"
+    mode: og-rwx
+    owner: root
+    group: root
+    recurse: yes
+  loop:
+    - /etc/cron.d
+    - /etc/cron.hourly
+    - /etc/cron.daily
+    - /etc/cron.weekly
+    - /etc/cron.monthly
+
+
+# 3.3 TCP Wrappers
+# 5.1.8 Ensure at/cron is restricted to authorized users
+# state=touch は存在しない場合に failed としないため
+- name: Ensure at/cron is restricted to authorized users
+  file:
+    path: "{{ item.path }}"
+    state: "{{ item.state }}"
+    mode: 0600
+  loop:
+    - path: /etc/at.deny
+      state: absent
+    - path: /etc/cron.deny
+      state: absent
+    - path: /etc/at.allow
+      state: touch
+    - path: /etc/cron.allow
+      state: touch

@@ -1,0 +1,21 @@
+---
+- name: copy /etc/sysconfig/clock
+  copy:
+    content: |
+      ZONE="Asia/Tokyo"
+      UTC=true
+    dest: /etc/sysconfig/clock
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: set timezone
+  command: timedatectl set-timezone Asia/Tokyo
+
+
+- name: enable chrony logging
+  lineinfile:
+    path: /etc/chrony.conf
+    regexp: '^#?log '
+    line: "log measurements statistics tracking"

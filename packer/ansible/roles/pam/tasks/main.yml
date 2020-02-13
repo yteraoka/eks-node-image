@@ -1,0 +1,64 @@
+---
+# 5回パスワード認証に失敗したら900秒間ロック
+- name: Ensure lockout for failed password attempts is configured
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp | default(omit) }}"
+    insertafter: "{{ item.insertafter | default(omit) }}"
+    insertbefore: "{{ item.insertbefore | default(omit) }}"
+  loop:
+    - line: 'auth        required      pam_faillock.so preauth audit silent deny=5 unlock_time=900'
+      insertafter: '^auth\s+required\s+pam_env.so'
+    - line: 'auth        [success=1 default=bad] pam_unix.so try_first_pass nullok'
+      regexp: '^auth\s+sufficient\s+pam_unix.so'
+    - line: 'auth        [default=die] pam_faillock.so authfail audit deny=5 unlock_time=900'
+      insertafter: '^auth\s+.*pam_unix.so try_first_pass nullok'
+    - line: 'auth        sufficient    pam_faillock.so authsucc audit deny=5 unlock_time=900'
+      insertbefore: '^auth\s+required\s+pam_deny.so'
+
+
+# パスワード変更を繰り返して同じパスワードに戻すのを防ぐ
+- name: Ensure password reuse is limited
+  lineinfile:
+    path: /etc/pam.d/password-auth
+    line: '\1 remember=5'
+    regexp: '^(password\s+sufficient\s+pam_unix.so.*)'
+    backrefs: yes
+
+
+- name: copy password-auth to system-auth
+  copy:
+    src: /etc/pam.d/password-auth
+    dest: /etc/pam.d/system-auth
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: yes
+
+
+# su コマンドを使えるのは wheel グループに所属するユーザーのみに限定
+- name: Ensure access to the su command is restricted
+  lineinfile:
+    path: /etc/pam.d/su
+    regexp: '#(auth\s+required\s+pam_wheel.so\s+use_uid.*)'
+    line: '\1'
+    backrefs: yes
+
+
+- name: Ensure password creation requirements are configured
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*{{ item.key }}\s*='
+    line: '{{ item.key }} = {{ item.value }}'
+  loop:
+    - key: minlen
+      value: 14
+    - key: dcredit
+      value: -1
+    - key: ucredit
+      value: -1
+    - key: ocredit
+      value: -1
+    - key: lcredit
+      value: -1

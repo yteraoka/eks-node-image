@@ -1,0 +1,86 @@
+{
+  "variables": {
+    "region": "ap-northeast-1"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "source_ami_filter": {
+        "filters": {
+          "name": "amazon-eks-node-{{ user `k8s_version` }}-*",
+          "virtualization-type": "hvm",
+          "architecture": "x86_64",
+          "root-device-type": "ebs"
+        },
+        "owners": ["amazon"],
+        "most_recent": true
+      },
+      "ami_name": "{{ user `basename` }}-{{ isotime | clean_resource_name }}",
+      "instance_type": "{{ user `instance_type` }}",
+      "ssh_username": "ec2-user",
+      "ena_support": true,
+      "tags": {
+        "Name": "{{ user `basename` }}-eks-{{ user `k8s_version` }}",
+        "OS_Version": "Amazon Linux 2",
+        "SourceAMIName": "{{ .SourceAMIName }}",
+        "Env": "{{ user `env` }}"
+      },
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/xvda",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `root_volume_size` }}"
+        },
+        {
+          "device_name": "/dev/xvdb",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `var_log_volume_size` }}"
+        },
+        {
+          "device_name": "/dev/xvdc",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `home_volume_size` }}"
+        },
+        {
+          "device_name": "/dev/xvdd",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `tmp_volume_size` }}"
+        },
+        {
+          "device_name": "/dev/xvde",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `var_tmp_volume_size` }}"
+        },
+        {
+          "device_name": "/dev/xvdf",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `var_spool_mail_volume_size` }}"
+        },
+        {
+          "device_name": "/dev/xvdg",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `var_log_audit_volume_size` }}"
+        },
+        {
+          "device_name": "/dev/xvdh",
+          "volume_type": "gp2",
+          "delete_on_termination": "true",
+          "volume_size": "{{ user `var_lib_docker_volume_size` }}"
+        }
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/playbook.yml"
+    }
+  ]
+}

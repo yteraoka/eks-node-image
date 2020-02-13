@@ -1,0 +1,45 @@
+---
+- name: copy audit.rules
+  copy:
+    src: audit.rules
+    dest: /etc/audit/rules.d/audit.rules
+    owner: root
+    group: root
+    mode: 0600
+
+
+- name: mkdir /var/log/audit
+  file:
+    state: directory
+    path: /var/log/audit
+    owner: root
+    group: root
+    mode: 0700
+
+
+- name: mkdir /etc/systemd/system/auditd.service.d
+  file:
+    state: directory
+    path: /etc/systemd/system/auditd.service.d
+    owner: root
+    group: root
+    mode: 0755
+
+
+# create /var/log/audit directory before start auditd
+- name: copy auditd.service.d/override.conf
+  copy:
+    content: |
+      [Service]
+      ExecStartPre=-/usr/bin/mkdir -p -m 0700 /var/log/audit
+    dest: /etc/systemd/system/auditd.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: enable auditd
+  systemd:
+    name: auditd
+    enabled: yes
+    daemon_reload: yes

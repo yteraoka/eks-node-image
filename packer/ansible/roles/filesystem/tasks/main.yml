@@ -1,0 +1,58 @@
+---
+- name: mkfs {{ fs_device_path }}
+  filesystem:
+    dev: "{{ fs_device_path }}"
+    fstype: "{{ fs_fstype | default('xfs') }}"
+
+
+- name: mount {{ fs_device_path }} on /mnt temporary
+  mount:
+    path: /mnt
+    src: "{{ fs_device_path }}"
+    fstype: "{{ fs_fstype | default('xfs') }}"
+    opts: "{{ fs_mount_options | default('defaults,nodev,nosuid,noexec,relatime') }}"
+    state: mounted
+
+
+- name: set new directory permission
+  file:
+    state: directory
+    path: /mnt
+    owner: "{{ fs_owner | default('root') }}"
+    group: "{{ fs_group | default('root') }}"
+    mode: "{{ fs_mode | default('0755') }}"
+
+
+- name: create ec2-ueser's home directory
+  file:
+    state: directory
+    path: /mnt/ec2-user
+    owner: ec2-user
+    group: ec2-user
+    mode: 0700
+  when: fs_mount_point == "/home"
+
+
+- name: copy skel files
+  shell: install -o ec2-user -g ec2-user -m 0600 -t /mnt/ec2-user /etc/skel/.bash*
+  when: fs_mount_point == "/home"
+
+
+- name: copy data from {{ fs_mount_point }} to {{ fs_device_path }}
+  shell: cd {{ fs_mount_point }} && tar -cf - . | tar -C /mnt -xf -
+  when: fs_do_copy
+
+
+- name: unmount temporary mounted volume
+  mount:
+    path: /mnt
+    state: absent
+
+
+- name: add {{ fs_mount_point }} into fstab
+  mount:
+    path: "{{ fs_mount_point }}"
+    src: "{{ fs_device_path }}"
+    fstype: "{{ fs_fstype | default('xfs') }}"
+    opts: "{{ fs_mount_options | default('defaults,nodev,nosuid,noexec,relatime') }}"
+    state: present

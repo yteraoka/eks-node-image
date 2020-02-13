@@ -1,0 +1,14 @@
+{
+  "basename": "my-eks-node-image",
+  "env": "staging",
+  "k8s_version": "1.14",
+  "instance_type": "t2.micro",
+  "root_volume_size": "10",
+  "var_log_volume_size": "10",
+  "home_volume_size": "1",
+  "tmp_volume_size": "1",
+  "var_tmp_volume_size": "1",
+  "var_spool_mail_volume_size": "1",
+  "var_log_audit_volume_size": "1",
+  "var_lib_docker_volume_size": "50"
+}

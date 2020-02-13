@@ -1,0 +1,26 @@
+---
+- name: copy /etc/logrotate.conf
+  copy:
+    src: logrotate.conf
+    dest: /etc/logrotate.conf
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: copy /etc/logrotate.d/syslog
+  copy:
+    src: logrotate-syslog.conf
+    dest: /etc/logrotate.d/syslog
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: execute logrotate at 0:00 everyday
+  copy:
+    src: crontab
+    dest: /etc/crontab
+    owner: root
+    group: root
+    mode: 0600

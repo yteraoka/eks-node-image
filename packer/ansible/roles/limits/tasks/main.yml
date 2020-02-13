@@ -1,0 +1,26 @@
+---
+- name: limits nofile
+  copy:
+    content: |
+      * soft nofile 65536
+      * hard nofile 65536
+    dest: /etc/security/limits.d/30-nofile.conf
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: limits core size
+  copy:
+    content: |
+      * hard core 0
+    dest: /etc/security/limits.d/40-core.conf
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: add ulimit into /etc/sysconfig/init
+  lineinfile:
+    path: /etc/sysconfig/init
+    line: "ulimit -n 65536"

@@ -1,0 +1,42 @@
+- hosts: all
+  become: true
+  roles:
+    - yum-update
+    - grub2
+    - sysctl
+    - limits
+    - logrotate
+    - clock
+    - cron
+    - ssh
+    - auditd
+    - pam
+    - selinux
+    - ssm-agent
+    - kernel-modules
+    - role: filesystem
+      fs_device_path: /dev/xvdb
+      fs_mount_point: /var/log
+    - role: filesystem
+      fs_device_path: /dev/xvdc
+      fs_mount_point: /home
+    - role: filesystem
+      fs_device_path: /dev/xvdd
+      fs_mount_point: /tmp
+      fs_mode: "1777"
+    - role: filesystem
+      fs_device_path: /dev/xvde
+      fs_mount_point: /var/tmp
+      fs_mode: "1777"
+    - role: filesystem
+      fs_device_path: /dev/xvdf
+      fs_mount_point: /var/spool/mail
+      fs_mode: "0775"
+      fs_group: mail
+    - role: filesystem
+      fs_device_path: /dev/xvdg
+      fs_mount_point: /var/log/audit
+      fs_mode: "0700"
+    - role: filesystem
+      fs_device_path: /dev/xvdh
+      fs_mount_point: /var/lib/docker

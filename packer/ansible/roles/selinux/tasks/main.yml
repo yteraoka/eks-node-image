@@ -1,0 +1,18 @@
+---
+- name: configure SELinux
+  lineinfile:
+    path: /etc/selinux/config
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  loop:
+    - line: "SELINUX={{ selinux }}"
+      regexp: "^SELINUX="
+    - line: "SELINUXTYPE={{ selinuxtype }}"
+      regexp: "^SELINUXTYPE="
+
+
+- name: enable auto relabel
+  file:
+    path: "/.autorelabel"
+    state: touch
+  when: selinux != "disabled"
