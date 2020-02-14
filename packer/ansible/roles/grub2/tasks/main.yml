@@ -6,6 +6,14 @@
     line: 'GRUB_CMDLINE_LINUX="audit=1"'
 
 
+- name: add crashkernel memory setting
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="(.*)"'
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="(crashkernel=160M \1)"'
+    backrefs: yes
+
+
 - name: rebuild grub2 config
   command: /usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg
 

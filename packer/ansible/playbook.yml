@@ -3,6 +3,7 @@
   roles:
     - yum-update
     - grub2
+    - kdump
     - sysctl
     - limits
     - logrotate

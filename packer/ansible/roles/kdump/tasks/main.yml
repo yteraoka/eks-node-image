@@ -1,0 +1,16 @@
+---
+- name: install kexec-tools
+  yum:
+    name: kexec-tools
+
+
+- name: sysctl unknown_nmi_panic=1
+  sysctl:
+    name: "kernel.unknown_nmi_panic"
+    value: "1"
+
+
+- name: enable kdump
+  systemd:
+    name: kdump.service
+    enabled: yes
