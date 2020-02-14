@@ -1,0 +1,8 @@
+---
+- name: persistent journal data
+  file:
+    path: /var/log/journal
+    state: directory
+    owner: root
+    group: systemd-journal
+    mode: 2755

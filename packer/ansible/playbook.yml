@@ -9,6 +9,7 @@
     - clock
     - cron
     - ssh
+    - journald
     - auditd
     - pam
     - selinux
