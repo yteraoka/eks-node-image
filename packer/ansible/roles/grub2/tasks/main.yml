@@ -10,7 +10,7 @@
   lineinfile:
     path: /etc/default/grub
     regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="(.*)"'
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="(crashkernel=160M \1)"'
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="crashkernel=160M \1"'
     backrefs: yes
 
 
