@@ -38,6 +38,21 @@
     mode: 0644
 
 
+# 64MB x 8 = 512MB
+- name: configure auditd log rotation
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  loop:
+    - line: 'max_log_file_action = ROTATE'
+      regexp: '^max_log_file_action\s*='
+    - line: 'max_log_file = 64'
+      regexp: '^max_log_file\s*='
+    - line: 'num_logs = 8'
+      regexp: '^num_logs\s*='
+
+
 - name: enable auditd
   systemd:
     name: auditd
