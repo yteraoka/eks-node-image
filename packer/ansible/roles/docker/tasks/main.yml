@@ -1,0 +1,9 @@
+---
+# https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
+- name: copy /etc/docker/daemon.json
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644

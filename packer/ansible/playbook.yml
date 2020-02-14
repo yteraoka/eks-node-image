@@ -13,6 +13,7 @@
     - auditd
     - pam
     - selinux
+    - docker
     - ssm-agent
     - kernel-modules
     - role: filesystem
